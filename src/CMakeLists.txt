@@ -56,6 +56,9 @@ if(APPLE)
 elseif(BEOS)
   list(APPEND SRC_OS pl-beos.c)
 endif()
+if(HAVE_9P)
+  list(APPEND SRC_OS os/9p/pl-9p.c)
+endif()
 prepend(SRC_OS os/ ${SRC_OS})
 
 

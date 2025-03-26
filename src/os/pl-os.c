@@ -69,6 +69,7 @@ is supposed to give the POSIX standard one.
 #include "pl-utf8.h"
 #include "../pl-fli.h"
 #include "../pl-setup.h"
+#include "9p/pl-9p.h"
 #include <math.h>
 #include <stdio.h>		/* rename() and remove() prototypes */
 
@@ -116,9 +117,10 @@ is supposed to give the POSIX standard one.
 #include <errno.h>
 #endif
 
-#if defined(__WATCOMC__)
-#include <io.h>
-#include <dos.h>
+#if defined(HAVE_SYS_TERMIO_H)
+#include <sys/termio.h>
+#define termios termio
+#define O_HAVE_TERMIO 1
 #endif
 
 #if OS2 && EMX
@@ -167,6 +169,12 @@ initOs(void)
   setPrologFlagMask(PLFLAG_FILE_CASE_PRESERVING);
 #endif
 
+#ifdef HAVE_9P
+  DEBUG(1, Sdprintf("OS:init9P() ...\n"));
+  if ( !pl_9p_init() )
+    return false;
+#endif
+
   DEBUG(1, Sdprintf("OS:done\n"));
 
   succeed;
@@ -177,6 +185,10 @@ void
 cleanupOs(void)
 { cleanupExpand();
   clean_tmp_dir();
+
+#ifdef HAVE_9P
+  pl_9p_cleanup();
+#endif
 }
 
 
